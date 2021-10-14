@@ -1,0 +1,16 @@
+{
+    "extends": ["eslint:recommended", "google"],
+    "rules": {
+        "indent": ["error", 4],
+        "linebreak-style": "off",
+        "semi": "off",
+        "object-curly-spacing": "off",
+        "require-jsdoc": "off"
+    },
+    "parser": "@babel/eslint-parser",
+    "env": {
+        "es6": true,
+        "browser": true,
+        "node": true
+    }
+}
