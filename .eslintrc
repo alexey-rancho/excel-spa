@@ -5,7 +5,8 @@
         "linebreak-style": "off",
         "semi": "off",
         "object-curly-spacing": "off",
-        "require-jsdoc": "off"
+        "require-jsdoc": "off",
+        "operator-linebreak": "off"
     },
     "parser": "@babel/eslint-parser",
     "env": {
