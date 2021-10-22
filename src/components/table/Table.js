@@ -1,5 +1,7 @@
 import { ExcelComponent } from '@core/ExcelComponent'
 import { createTable } from './table.template'
+import { resizeHandler } from './table.resize'
+import { isResizable } from './table.functions'
 
 export class Table extends ExcelComponent {
     static className = 'excel__table'
@@ -7,7 +9,7 @@ export class Table extends ExcelComponent {
     constructor($root) {
         super($root, {
             name: 'Table',
-            listeners: ['click'],
+            listeners: ['mousedown'],
         })
     }
 
@@ -15,7 +17,9 @@ export class Table extends ExcelComponent {
         return createTable()
     }
 
-    onClick(event) {
-        console.log(event.target)
+    onMousedown(event) {
+        if (isResizable(event)) {
+            resizeHandler(event, this.$root)
+        }
     }
 }
