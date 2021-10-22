@@ -8,6 +8,7 @@ export function resizeHandler(event, $root) {
     const resizeType = $resize.data.resizeType
     const $parent = $resize.closest('[data-type="resizable"]')
     const coords = $parent.getCoords()
+    const offset = $parent.offset()
     let value
     let delta
     $resize.addClass('pressed')
@@ -15,13 +16,13 @@ export function resizeHandler(event, $root) {
 
     document.onmousemove = (e) => {
         if (resizeType === 'col') {
-            delta = e.pageX - $parent.offset().right
+            delta = e.pageX - offset.right
             value = coords.width + delta
             if (value > COLUMN_MIN_WIDTH) {
                 $resize.css({ right: -delta + 'px' })
             }
         } else {
-            delta = e.pageY - $parent.offset().bottom
+            delta = e.pageY - offset.bottom
             value = coords.height + delta
             if (value > ROW_MIN_HEIGH) {
                 $resize.css({ bottom: -delta + 'px' })
