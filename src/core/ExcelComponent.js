@@ -7,7 +7,7 @@ export class ExcelComponent extends DOMListener {
     }
 
     /**
-     * @return {string} returns component tamplate
+     * @return {string} returns component template
      */
     toHTML() {
         return ''

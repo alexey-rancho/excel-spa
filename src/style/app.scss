@@ -16,6 +16,11 @@
 body {
     font-family: 'Roboto', sans-serif;
     font-size: 12px;
+
+    &.not-selectable {
+        user-select: none;
+        pointer-events: none;
+    }
 }
 
 .excel {
