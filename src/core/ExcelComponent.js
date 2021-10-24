@@ -4,6 +4,7 @@ export class ExcelComponent extends DOMListener {
     constructor($root, options = {}) {
         super($root, options.listeners)
         this.name = options.name || ''
+        this.prepare()
     }
 
     /**
@@ -12,6 +13,12 @@ export class ExcelComponent extends DOMListener {
     toHTML() {
         return ''
     }
+
+    /**
+     * This method is needed for simplifying
+     * and separating init method
+     */
+    prepare() {}
 
     init() {
         this.initDOMListeners()

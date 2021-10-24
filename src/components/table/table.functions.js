@@ -6,3 +6,11 @@
 export function isResizable(event) {
     return event.target.dataset.resizeType
 }
+
+export function isSelectable(event) {
+    return typeof event.target.dataset.selectable === 'string'
+}
+
+export function isGroupSelectable(event) {
+    return isSelectable(event) && (event.ctrlKey || event.shiftKey)
+}

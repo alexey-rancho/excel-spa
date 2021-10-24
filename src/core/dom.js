@@ -88,6 +88,12 @@ class Dom {
         return $(this.$nativeEl.closest(selector))
     }
 
+    find(selector) {
+        return this.$nativeEl instanceof Dom
+            ? this.$nativeEl.find(selector)
+            : $(this.$nativeEl.querySelector(selector))
+    }
+
     findAll(selector) {
         const elements = Array
             .from(this.$nativeEl.querySelectorAll(selector))

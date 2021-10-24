@@ -10,27 +10,27 @@ export function createTable(columnsCount = ALPHABET_LENGTH, rowsCount = 20) {
 function createHeader(columnsCount) {
     const columns = new Array(columnsCount)
         .fill('')
-        .map((val, index) => {
-            const letter = toAlphabetLetter(index + 1)
-            return createColumn(letter, index)
-        })
+        .map(createColumn)
         .join('')
     return createRow(null, columns)
 }
 
 function createBody(columnsCount, rowsCount) {
-    const cells = new Array(columnsCount)
-        .fill('')
-        .map((val, index) => createCell(null, index))
-        .join('')
     const rows = new Array(rowsCount)
         .fill('')
-        .map((val, index) => createRow(index + 1, cells))
+        .map((val, rowIndex) => {
+            const cells = new Array(columnsCount)
+                .fill('')
+                .map(createCell(rowIndex))
+                .join('')
+            return createRow(rowIndex + 1, cells, rowIndex)
+        })
         .join('')
     return rows
 }
 
-function createColumn(letter, index) {
+function createColumn(_, index) {
+    const letter = toAlphabetLetter(index + 1)
     return `
         <div class="column" data-type="resizable" data-col="${index}">
             ${letter || ''}
@@ -39,33 +39,39 @@ function createColumn(letter, index) {
     `
 }
 
-function createCell(content, index) {
-    return `
-        <div class="cell" contenteditable data-col="${index}">
-            ${content || ''}
-        </div>
-    `
+function createCell(rowIndex) {
+    return (_, colIndex) => {
+        return `
+            <div class="cell"
+                contenteditable 
+                data-selectable
+                data-col="${colIndex}"
+                data-row="${rowIndex}"
+                data-id="${rowIndex}:${colIndex}"
+            ></div>
+        `
+    }
 }
 /**
- * @param {*} rowInfo if it passed, resize element and
- * data-type="resizable"are added
- * @param {*} rowData the body of the row
+ * @param {*} info if it passed, resize element and
+ * data-type="resizable" and data-row="@param index" are added
+ * @param {*} body the body of the row
+ * @param {Number} index row index
  * @return {String} html template
  */
-function createRow(rowInfo, rowData) {
-    const rowResize = rowInfo
+function createRow(info, body, index) {
+    const rowResize = info
         ? `<div class="row-resize" data-resize-type="row"></div>`
         : ''
-    const dataType = rowInfo
-        ? `data-type="resizable"`
-        : ''
+    const dataType = info ? `data-type="resizable"` : ''
+    const dataRow = index || index === 0 ? `data-row="${index}"` : ''
     return `
-        <div class="row" ${dataType}>
+        <div class="row" ${dataType} ${dataRow}>
             <div class="row-info">
-                ${rowInfo || ''}
+                ${info || ''}
                 ${rowResize}
             </div>
-            <div class="row-data">${rowData || ''}</div>
+            <div class="row-data">${body || ''}</div>
         </div>
     `
 }
