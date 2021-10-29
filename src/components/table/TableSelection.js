@@ -1,36 +1,47 @@
-// import { $ } from '@core/dom'
+import { range } from '../../core/utils'
+
+const CLASS_NAME = 'selected'
 
 export class TableSelection {
     constructor() {
         this.group = []
+        this.current = null
     }
 
-    select($el) {
-        this.group.forEach(($el) => $el.removeClass('selected'))
+    clear() {
+        this.group.forEach(($el) => $el.removeClass(CLASS_NAME))
         this.group = []
-        $el.addClass('selected')
-        this.group.push($el)
     }
 
-    selectGroup($el, event, $root) {
-        if (event.ctrlKey) {
-            $el.addClass('selected')
-            this.group.push($el)
-        } else if (event.shiftKey) {
-            // row
-            // col
-            // if (this.group.length === 0)
-            const arr = $el.data.id.split(':')
-            const pos = { row: arr[0], col: arr[1] }
-            this.group.push({ $el, pos })
-            console.log(pos)
-            if (this.group.length === 2) {
-                this.group[0].pos.row
-                this.group[0].pos.col
-                this.group[1].pos.row
-                this.group[1].pos.col
-                $root.findAll('[data-row=""]')
-            }
-        }
+    add($el) {
+        this.group.push($el)
+        this.current = $el
+    }
+
+    /**
+     * @param {Dom} $el instance of Dom class
+     */
+    select($el) {
+        this.clear()
+        $el.addClass(CLASS_NAME)
+        $el.focus()
+        this.add($el)
+    }
+
+    selectGroup($el, $root) {
+        this.clear()
+        const current = this.current.id(true)
+        const target = $el.id(true)
+        const rows = range(current.row, target.row)
+        const cols = range(current.col, target.col)
+        const ids = rows.reduce((acc, row) => {
+            cols.forEach((col) => acc.push(`${row}:${col}`))
+            return acc
+        }, [])
+        this.group = ids.map((id) => {
+            const cell = $root.find(`[data-id="${id}"]`)
+            cell.addClass(CLASS_NAME)
+            return cell
+        })
     }
 }

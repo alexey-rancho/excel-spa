@@ -44,7 +44,7 @@ function createCell(rowIndex) {
         return `
             <div class="cell"
                 contenteditable 
-                data-selectable
+                data-type="selectable"
                 data-col="${colIndex}"
                 data-row="${rowIndex}"
                 data-id="${rowIndex}:${colIndex}"

@@ -1,4 +1,4 @@
-import { $ } from '@core/dom'
+import { $ } from '../../core/dom'
 
 const ROW_MIN_HEIGH = 20
 const COLUMN_MIN_WIDTH = 40
@@ -29,7 +29,7 @@ export function resizeHandler(event, $root) {
             }
         }
     }
-    document.onmouseup = (e) => {
+    document.onmouseup = () => {
         if (resizeType === 'col') {
             const colIndex = $parent.data.col
             $root.findAll(`[data-col="${colIndex}"]`).forEach((el) => {
