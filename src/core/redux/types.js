@@ -1,0 +1,6 @@
+export const NONE = 'NONE'
+export const SELECT_CELL = 'SELECT_CELL'
+export const RENAME_TABLE = 'RENAME_TABLE'
+export const RESIZE_COLUMN = 'RESIZE_COLUMN'
+export const RESIZE_ROW = 'RESIZE_ROW'
+export const TEXT_INPUT = 'TEXT_INPUT'

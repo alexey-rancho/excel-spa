@@ -1,88 +1,141 @@
-const ALPHABET_LENGTH = 26
+import { toAlphabetLetter } from '../../core/utils'
 
-export function createTable(columnsCount = ALPHABET_LENGTH, rowsCount = 20) {
+const DEFAULT_COLUMN_WIDTH = '120px'
+const DEFAULT_ROW_HEIGHT = '24px'
+
+export function createTable(state) {
+    const columnsCount = state.table.columnsCount
+    const rowsCount = state.table.rowsCount
     return `
-        ${createHeader(columnsCount)}
-        ${createBody(columnsCount, rowsCount)}
+        ${createHeader(columnsCount, state)}
+        ${createBody(columnsCount, rowsCount, state)}
     `
 }
 
-function createHeader(columnsCount) {
+function createHeader(columnsCount, state) {
     const columns = new Array(columnsCount)
         .fill('')
-        .map(createColumn)
+        .map((_, index) => {
+            const width = getCellWidth(index, state)
+            return createColumn(index, width)
+        })
         .join('')
     return createRow(null, columns)
 }
 
-function createBody(columnsCount, rowsCount) {
+function createCells(columnsCount, state) {
+    return (_, rowIndex) => {
+        const cells = new Array(columnsCount)
+            .fill('')
+            .map(createCellWithState(rowIndex, state))
+            .join('')
+        const height = getRowHeight(rowIndex, state)
+        return createRow(rowIndex, cells, height)
+    }
+}
+
+function createBody(columnsCount, rowsCount, state) {
     const rows = new Array(rowsCount)
         .fill('')
-        .map((val, rowIndex) => {
-            const cells = new Array(columnsCount)
-                .fill('')
-                .map(createCell(rowIndex))
-                .join('')
-            return createRow(rowIndex + 1, cells, rowIndex)
-        })
+        .map(createCells(columnsCount, state))
         .join('')
     return rows
 }
 
-function createColumn(_, index) {
+function getCellWidth(index, state) {
+    const columnSizes = state.table.columnSizes
+    const columnSize = columnSizes.find((size) => {
+        return size.index === index
+    })
+    return columnSize
+        ? columnSize.size + 'px'
+        : DEFAULT_COLUMN_WIDTH
+}
+
+function getRowHeight(index, state) {
+    const rowSizes = state.table.rowSizes
+    const rowSize = rowSizes.find((size) => {
+        return size.index === index
+    })
+    return rowSize
+        ? rowSize.size + 'px'
+        : DEFAULT_ROW_HEIGHT
+}
+
+function getCellContent(id, state) {
+    const cellContents = state.table.cellContents
+    const cellContent = cellContents.find((content) => {
+        return content.id === id
+    })
+    return cellContent ? cellContent.content : ''
+}
+
+function createColumn(index, width) {
     const letter = toAlphabetLetter(index + 1)
     return `
-        <div class="column" data-type="resizable" data-col="${index}">
+        <div class="column" 
+            data-type="resizable"
+            data-col="${index}"
+            style="width: ${width};"
+        >
             ${letter || ''}
             <div class="col-resize" data-resize-type="col"></div>
         </div>
     `
 }
 
-function createCell(rowIndex) {
+function createCell(options) {
+    return `
+        <div class="cell"
+            contenteditable 
+            data-type="selectable"
+            data-col="${options.colIndex}"
+            data-row="${options.rowIndex}"
+            data-id="${options.rowIndex}:${options.colIndex}"
+            style="width: ${options.width};"
+        >
+            ${options.content}
+        </div>
+    `
+}
+
+function createCellWithState(rowIndex, state) {
     return (_, colIndex) => {
-        return `
-            <div class="cell"
-                contenteditable 
-                data-type="selectable"
-                data-col="${colIndex}"
-                data-row="${rowIndex}"
-                data-id="${rowIndex}:${colIndex}"
-            ></div>
-        `
+        const width = getCellWidth(colIndex, state)
+        const id = `${rowIndex}:${colIndex}`
+        const content = getCellContent(id, state)
+        return createCell({
+            rowIndex,
+            colIndex,
+            id,
+            width,
+            content,
+        })
     }
 }
+
 /**
- * @param {*} info if it passed, resize element and
- * data-type="resizable" and data-row="@param index" are added
- * @param {*} body the body of the row
  * @param {Number} index row index
+ * @param {*} body the body of the row
+ * @param {String} height row height in pixels (120px, 30px and so on)
  * @return {String} html template
  */
-function createRow(info, body, index) {
-    const rowResize = info
+function createRow(index, body, height = DEFAULT_ROW_HEIGHT) {
+    const serialNum = typeof index === 'number' && index >= 0
+        ? index + 1
+        : null
+    const rowResize = serialNum
         ? `<div class="row-resize" data-resize-type="row"></div>`
         : ''
-    const dataType = info ? `data-type="resizable"` : ''
-    const dataRow = index || index === 0 ? `data-row="${index}"` : ''
+    const dataType = serialNum ? `data-type="resizable"` : ''
+    const dataRow = index >= 0 ? `data-row="${index}"` : ''
     return `
-        <div class="row" ${dataType} ${dataRow}>
+        <div class="row" ${dataType} ${dataRow} style="height: ${height};">
             <div class="row-info">
-                ${info || ''}
+                ${serialNum || ''}
                 ${rowResize}
             </div>
             <div class="row-data">${body || ''}</div>
         </div>
     `
-}
-
-/**
- * @param {Number} letterNumber serial number of alphabet letter
- * @return {String} alphabet letter corresponding to its serial number
- */
-function toAlphabetLetter(letterNumber = 1) {
-    if (letterNumber > ALPHABET_LENGTH) {
-        letterNumber = letterNumber % ALPHABET_LENGTH
-    }
-    return String.fromCharCode(letterNumber + 64)
 }

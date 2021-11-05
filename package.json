@@ -1,7 +1,7 @@
 {
   "name": "excel-spa",
   "version": "1.0.0",
-  "description": "excel app",
+  "description": "pure excel app",
   "main": "/scr/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/alexey-rancho/excel-spa.git"
   },
-  "author": "",
+  "author": "alexey-rancho",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/alexey-rancho/excel-spa/issues"
@@ -41,6 +41,8 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "normalize.css": "^8.0.1"
+    "combine-reducers": "^1.0.0",
+    "normalize.css": "^8.0.1",
+    "recursive-diff": "^1.0.8"
   }
 }

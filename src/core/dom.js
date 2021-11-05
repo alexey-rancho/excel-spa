@@ -13,10 +13,17 @@ class Dom {
     }
 
     set content(text) {
-        this.$nativeEl.textContent = text
+        if (typeof this.$nativeEl.value === 'string') {
+            this.$nativeEl.value = text
+        } else {
+            this.$nativeEl.textContent = text
+        }
     }
 
     get content() {
+        if (typeof this.$nativeEl.value === 'string') {
+            return this.$nativeEl.value.trim()
+        }
         return this.$nativeEl.textContent.trim()
     }
 
@@ -133,6 +140,10 @@ class Dom {
 
     focus() {
         this.$nativeEl.focus()
+    }
+
+    blur() {
+        this.$nativeEl.blur()
     }
 }
 

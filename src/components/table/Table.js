@@ -4,9 +4,7 @@ import { resizeHandler } from './table.resize'
 import { isResizable, isSelectable, nextSelector } from './table.functions'
 import { TableSelection } from './TableSelection'
 import { $ } from '../../core/dom'
-
-export const COLUMNS_COUNT = 26
-export const ROWS_COUNT = 20
+import * as actions from '../../core/redux/actions'
 
 const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Enter']
 
@@ -22,7 +20,7 @@ export class Table extends ExcelComponent {
     }
 
     toHTML() {
-        return createTable(COLUMNS_COUNT, ROWS_COUNT)
+        return createTable(this.$getState())
     }
 
     prepare() {
@@ -31,24 +29,70 @@ export class Table extends ExcelComponent {
 
     selectCell($cell) {
         this.selection.select($cell)
-        this.$notify('table:select', this.selection.current.content)
+        // this.$notify('table:select', this.selection.current.content)
+        this.$dispatch(actions.selectCell(this.selection.current.id()))
     }
 
     init() {
         super.init()
-        const $cell = this.$root.find('[data-id="0:0"]')
-        this.selectCell($cell)
-        this.$subscribe('formula:input', (text) => {
-            this.selection.current.content = text
-        })
+
+        // const currentCellId = this.$getState().table.currentCell
+        // const $cell = this.$root.find(`[data-id="${currentCellId}"]`)
+        // this.selectCell($cell)
+
+        // this.$subscribe('formula:input', (text) => {
+        //     this.updateCellState(text)
+        //     this.selection.current.content = text
+        // })
         this.$subscribe('formula:enter', () => {
             this.selection.current.focus()
         })
     }
 
+    async resizeTable(event) {
+        try {
+            const resizeData = await resizeHandler(event, this.$root)
+            this.$dispatch(actions.resize(resizeData))
+        } catch (e) {
+            console.warn(e)
+        }
+    }
+
+    stateUpdated(path) {
+        switch (path) {
+        case 'table/currentCell': {
+            console.log('table/currentCell')
+            const currentCellId = this.$getState().table.currentCell
+            const $cell = this.$root.find(`[data-id="${currentCellId}"]`)
+            this.selection.select($cell)
+            break
+        }
+        case 'table/cellContents': {
+            console.log('table/cellContents')
+            const currentCellId = this.$getState().table.currentCell
+            const cellContent = this.$getState().table.cellContents
+                .find((content) => content.id === currentCellId)
+            if (cellContent) {
+                this.selection.current.content = cellContent.content
+            } else {
+                this.selection.current.content = ''
+            }
+            break
+        }
+        case 'table/columnSizes': {
+            console.log('table/columnSizes')
+            break
+        }
+        case 'table/rowSizes': {
+            console.log('table/rowSizes')
+            break
+        }
+        }
+    }
+
     onMousedown(event) {
         if (isResizable(event)) {
-            resizeHandler(event, this.$root)
+            this.resizeTable(event)
         }
         if (isSelectable(event)) {
             const $target = $(event.target)
@@ -69,7 +113,14 @@ export class Table extends ExcelComponent {
         }
     }
 
+    // updates state (content) of current chosen cell
+    updateCellState(content) {
+        this.$dispatch(actions.inputText(content))
+    }
+
     onInput() {
-        this.$notify('table:input', this.selection.current.content)
+        const cellContent = this.selection.current.content
+        // this.$notify('table:input', cellContent)
+        this.updateCellState(cellContent)
     }
 }

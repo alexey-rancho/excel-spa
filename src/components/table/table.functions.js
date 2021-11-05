@@ -1,4 +1,5 @@
-import { COLUMNS_COUNT, ROWS_COUNT } from './Table'
+const COLUMNS_COUNT = 26
+const ROWS_COUNT = 20
 
 /**
  * @param {Event} event event from listener
